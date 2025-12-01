@@ -14,9 +14,11 @@
   maxbibnames=99
 }
 
-% numbering "1." without brackets
+% bibliography
 \DeclareFieldFormat{labelnumberwidth}{#1\adddot}
 \DeclareFieldFormat{labelnumber}{#1\adddot}
+
+\setlength{\bibitemsep}{0pt}
 
 \defbibenvironment{bibliography}
   {\list
