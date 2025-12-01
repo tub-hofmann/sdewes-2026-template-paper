@@ -1,0 +1,198 @@
+\ProvidesFile{SDEWES.bbx}[2025/12/01 bibliography style - Mathias Hofmann, Berlin, Germany, https://mathias-hofmann.com/]
+
+\RequireBibliographyStyle{numeric}
+
+% name format
+\DeclareNameAlias{default}{family-given}
+
+% options
+\ExecuteBibliographyOptions{
+  doi=false,
+  isbn=false,
+  eprint=false,
+  giveninits=true,
+  maxbibnames=99
+}
+
+% numbering "1." without brackets
+\DeclareFieldFormat{labelnumberwidth}{#1\adddot}
+\DeclareFieldFormat{labelnumber}{#1\adddot}
+
+\defbibenvironment{bibliography}
+  {\list
+     {\printtext[labelnumberwidth]{%
+        \printfield{labelprefix}%
+        \printfield{labelnumber}}}
+     {\setlength{\labelwidth}{\labelnumberwidth}%
+      \setlength{\leftmargin}{\labelwidth}%
+      \setlength{\labelsep}{\biblabelsep}%
+      \addtolength{\leftmargin}{\labelsep}%
+      \setlength{\itemsep}{\bibitemsep}%
+      \setlength{\parsep}{\bibparsep}}%
+      \renewcommand*{\makelabel}[1]{\hss##1}}
+  {\endlist}
+  {\item}
+
+% punctuation 
+\renewcommand*{\newunitpunct}{\addcomma\space}
+\renewcommand*{\labelnamepunct}{\addcomma\space}
+\renewcommand*{\finentrypunct}{\addperiod}
+
+% multiple authors separated by comma
+\renewcommand*{\multinamedelim}{\addcomma\space}
+\renewcommand*{\finalnamedelim}{\addcomma\space}
+
+% remove "In:"
+\renewbibmacro{in:}{}
+
+% title formats
+\DeclareFieldFormat[article,inproceedings,thesis]{title}{#1}
+\DeclareFieldFormat[book]{title}{\mkbibemph{#1}}
+\DeclareFieldFormat[online]{title}{\mkbibemph{#1}}
+
+% journal/booktitle in italics
+\DeclareFieldFormat[article]{journaltitle}{\mkbibemph{#1}}
+\DeclareFieldFormat[inproceedings]{booktitle}{\mkbibemph{#1}}
+
+% volume, number, pages
+\DeclareFieldFormat[article]{volume}{Vol\adddot\space#1}
+\DeclareFieldFormat[article]{number}{No\adddot\space#1}
+\DeclareFieldFormat{pages}{pp\addspace#1}
+
+% volume, number, pages, date for articles
+\newbibmacro*{volume+number+pages+date}{%
+  \setunit{\addspace}%
+  \printfield{volume}%
+  \setunit{\addcomma\space}%
+  \printfield{number}%
+  \setunit{\addcomma\space}%
+  \printfield{pages}%
+  \setunit{\addcomma\space}%
+  \printtext{\usebibmacro{date}}%
+}
+
+% thesis type (italic)
+\DeclareFieldFormat[thesis]{type}{\mkbibemph{#1}}
+
+% URL clean (no "url:")
+\DeclareFieldFormat{url}{\url{#1}}
+
+% parse urldate and format as: [Accessed: 7-July-2018]
+\newcommand{\printsdewesurldate}{%
+  \iffieldundef{urlday}
+    {}
+    {\printtext{[Accessed:\space}%
+     \thefield{urlday}%
+     \printtext{-}%
+     \mkbibmonth{\thefield{urlmonth}}%
+     \printtext{-}%
+     \thefield{urlyear}%
+     \printtext{]}}%
+}
+
+% combine URL + accessed
+\renewbibmacro*{url+urldate}{%
+  \iffieldundef{url}
+    {}
+    {\printfield{url}%
+     \setunit{\addspace}%
+     \printsdewesurldate}%
+}
+
+% event date format for inproceedings: "July 4-8, 1994"
+\newbibmacro*{printeventdate}{%
+  \iffieldundef{eventmonth}
+    {}
+    {\mkbibmonth{\thefield{eventmonth}}%
+     \addspace\thefield{eventday}%
+     \iffieldundef{eventendday}
+       {}
+       {\textendash\thefield{eventendday}}%
+     \addcomma\space\thefield{eventyear}}%
+}
+
+% article driver
+\DeclareBibliographyDriver{article}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \usebibmacro{author/translator+others}%
+  \setunit{\labelnamepunct}\newblock
+  \usebibmacro{title}%
+  \newunit\newblock
+  \usebibmacro{journal}%
+  \usebibmacro{volume+number+pages+date}%
+  \newunit\newblock
+  \usebibmacro{finentry}%
+}
+
+% book driver
+\DeclareBibliographyDriver{book}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \usebibmacro{author/editor+others/translator+others}%
+  \setunit{\labelnamepunct}\newblock
+  \usebibmacro{title}%
+  \newunit\newblock
+  \printlist{publisher}%
+  \setunit{\addcomma\space}%
+  \printlist{location}%
+  \setunit{\addcomma\space}%
+  \usebibmacro{date}%
+  \newunit\newblock
+  \usebibmacro{finentry}%
+}
+
+% thesis driver
+\DeclareBibliographyDriver{thesis}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \usebibmacro{author}%
+  \setunit{\labelnamepunct}\newblock
+  \usebibmacro{title}%
+  \newunit\newblock
+  \printfield{type}%
+  \setunit{\addcomma\space}%
+  \printlist{institution}%
+  \setunit{\addcomma\space}%
+  \printlist{location}%
+  \setunit{\addcomma\space}%
+  \usebibmacro{date}%
+  \newunit\newblock
+  \usebibmacro{finentry}%
+}
+
+% inproceedings driver
+\DeclareBibliographyDriver{inproceedings}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \usebibmacro{author/translator+others}%
+  \setunit{\labelnamepunct}\newblock
+  \usebibmacro{title}%
+  \newunit\newblock
+  \usebibmacro{booktitle}%
+  \setunit{\addcomma\space}%
+  \printlist{location}%
+  \setunit{\addcomma\space}%
+  \usebibmacro{printeventdate}%
+  \setunit{\addcomma\space}%
+  \printfield{pages}%
+  \setunit{\addperiod}%
+  \newunit\newblock
+  \usebibmacro{finentry}%
+}
+
+% online driver
+\DeclareBibliographyDriver{online}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \usebibmacro{author/editor+others/translator+others}%
+  \setunit{\labelnamepunct}\newblock
+  \usebibmacro{title}%
+  \newunit\newblock
+  \usebibmacro{url+urldate}%
+  \setunit{\addperiod}%
+  \newunit\newblock
+  \usebibmacro{finentry}%
+}
+
+\endinput
